@@ -1,0 +1,44 @@
+version: '3'
+services: 
+  web:
+    build:
+      ./nginx
+    image: 
+      nginx/lnmp
+    ports: 
+      - 8080:80
+    networks: 
+      - web-app_network
+    depends_on: 
+      - app
+
+  app:
+    build: 
+      ./php
+    image:
+      php/lnmp
+    networks: 
+      - web-app_network
+      - app-db_network
+    env_file: 
+      ./mysql/.env
+    environment:
+      DATABASE_HOST: db
+    volumes: 
+      - ../src:/var/www/html
+    depends_on: 
+      - db
+
+  db:
+    build:
+      ./mysql
+    image:
+      mysql/lnmp
+    networks:
+      - app-db_network
+    env_file:
+      ./mysql/.env
+
+networks: 
+  web-app_network:
+  app-db_network:
